@@ -69,8 +69,21 @@ module.exports = {
     console.time('testBrain');
     //TODO: Your code here to get the predicted values for everything in our testData
     //The logging code below expects the predicted net values to be stored as properties on each item in testData under the property name output. 
-
-    //
+    //Here's what an object in testData should look like:
+      /*
+      { input: 
+         { utilizationRate: 0.21939333333333333,
+           age: 0.3486238532110092,
+           thirtyDaysLate: 0.01020408163265306,
+           monthlyIncome: 0.031789238577839024,
+           openCreditLines: 0.1767766952966369,
+           ninetyDaysLate: 0.1,
+           realEstateLines: 0,
+           sixtyDaysLate: 0,
+           numDependents: 0 },
+        output: { defaulted: 0 },
+        nnPredictions: { defaulted: 0.34634397489904356 } }
+      */
     for(var i = 0; i < testData.length; i++) {
       testData[i].output = net.run(testData[i].input);
     }
@@ -92,7 +105,7 @@ module.exports = {
       results[prediction].defaulted += testData[i].output.defaulted;
     }
 
-    //yeah, i know we don't like to assume the keys are going to be ordered, but it's a time-saving shortcut to make at the moment.
+    //We don't like to assume the keys are going to be ordered, but it's a time-saving shortcut to make at the moment.
     for(var key in results) {
       console.log(key + '- nnCount: ' + results[key].nnCount + ' defaulted: ' + results[key].defaulted + ' Default Rate: ' + results[key].defaulted/results[key].nnCount);
     }
