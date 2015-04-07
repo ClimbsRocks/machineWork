@@ -5,7 +5,7 @@ var brain = require('brain');
 
 //TODO: SOLUTION CODE BELOW
 var net = new brain.NeuralNetwork({
-  hiddenLayers:[1000], //Use the docs to explore various numbers you might want to use here
+  hiddenLayers:[200], //Use the docs to explore various numbers you might want to use here
   learningRate:0.3
 });
 /*
@@ -24,9 +24,11 @@ module.exports = {
         var training = [];
         var testing = [];
         for(var i = 0; i < formattedData.length; i++) {
+          //separate our data into a randomly selected training set (80% of the data)
           if(Math.random() > .8) {
             testing.push(formattedData[i]);
           } else {
+          //and a test set which we will use to test our trained net (20% of the data)
             training.push(formattedData[i]);
           }
         }
@@ -34,7 +36,7 @@ module.exports = {
         console.log(training.length);
         console.log('testing.length');
         console.log(testing.length);
-        res.send('Off to train the brain!');
+        res.send('Off to train the brain!\n');
         module.exports.trainBrain(training, testing);
       }
     });
@@ -98,20 +100,16 @@ module.exports = {
     }
 
     for(var i = 0; i < testData.length; i++) {
-      testData[i].output = net.run(testData[i].input);
+      testData[i].nnPredictions = net.run(testData[i].input);
     }
+    console.log(testData[0]);
 
     for(var j = 0; j < testData.length; j++) {
       //net.run gives us the net's prediction for that particular input
       //TODO: SOLUTION CODE BELOW. Consider refactoring outside of for statement.
       // var rawPrediction = net.run(testData[j].input);
       //we then format the net's prediction to be a number between 0 and 100
-      var prediction = Math.round( testData[j].output.defaulted * 100);
-      // console.log(net);
-      // console.log('prediction');
-      // console.log(rawPrediction);
-      // console.log('testData[i]');
-      // console.log(testData[i].input);
+      var prediction = Math.round( testData[j].nnPredictions.defaulted * 100);
       //We then increment the total number of cases that the net predicts exist at this level
       results[prediction].nnCount++;
       //And whether this input resulted in a default or not
@@ -129,7 +127,7 @@ module.exports = {
 
   //Writes the neural net to a file for backup
   writeBrain: function(json) {
-    var fileName = 'netBackup' + new Date().getTime();
+    var fileName = 'hiddenLayers' + net.hiddenLayers + 'learningRate' + net.learningRate + new Date().getTime();
     fs.writeFile(fileName, json, function(err) {
       if(err) {
         console.error('sad, did not write to file');
