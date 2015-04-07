@@ -127,7 +127,8 @@ module.exports = {
 
   //Writes the neural net to a file for backup
   writeBrain: function(json) {
-    var fileName = 'hiddenLayers' + net.hiddenLayers + 'learningRate' + net.learningRate + new Date().getTime();
+    console.log(net)
+    var fileName = 'hiddenLayers' + net.hiddenSizes + 'learningRate' + net.learningRate + new Date().getTime();
     fs.writeFile(fileName, json, function(err) {
       if(err) {
         console.error('sad, did not write to file');
