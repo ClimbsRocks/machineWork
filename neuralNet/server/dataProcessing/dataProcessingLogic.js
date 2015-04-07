@@ -3,16 +3,8 @@ var path = require('path');
 var fs = require('fs');
 var brain = require('brain');
 
-//TODO: SOLUTION CODE BELOW
-var net = new brain.NeuralNetwork({
-  hiddenLayers:[1000,1000,1000], //Use the docs to explore various numbers you might want to use here
-  learningRate:0.3
-});
-/*
-TODO:
-investigate whether the delinquency days are an input or an output
-create my own metrics for the inputs, such as income coverage ratio
-*/
+//TODO: your code here
+
 
 module.exports = {
   startNet: function(req,res) {
@@ -41,14 +33,12 @@ module.exports = {
         console.error(err);
       } else {
         var formattedData = module.exports.formatData(response);
-        //TODO: add in a query parameter that includes the filename, and parse that from the path
         fs.readFile('name', 'utf8', function(err, data) {
           if(err) {
             console.error(err);
           } else {
             net.fromJSON(JSON.parse(data));
-            //TODO: send off a response
-            //TODO: investigate separating out a training and a testing table
+            res.send('Loaded the brain! Testing it now.')
             module.exports.testBrain(formattedData);
           }
         });
@@ -59,16 +49,9 @@ module.exports = {
 
   trainBrain: function(trainingData, testingData) {
     console.time('trainBrain');
-    console.log('training your very own Brain');
+    console.log('Training your very own Brain');
 
-    //TODO: SOLUTION CODE BELOW
-    net.train(trainingData,{
-      errorThresh: 0.05,  // error threshold to reach
-      iterations: 30,   // maximum training iterations
-      log: true,           // console.log() progress periodically
-      logPeriod: 1,       // number of iterations between logging
-      learningRate: 0.3    // learning rate
-    });
+    //TODO: Your code here
 
     var jsonBackup = net.toJSON();
     var runBackup = net.toFunction();
@@ -84,6 +67,14 @@ module.exports = {
   //Logs the output of default rate at that prediction level
   testBrain: function(testData) {
     console.time('testBrain');
+    //TODO: Your code here to get the predicted values for everything in our testData
+    //The logging code below expects the predicted net values to be stored as properties on each item in testData under the property name output. 
+
+    //
+    for(var i = 0; i < testData.length; i++) {
+      testData[i].output = net.run(testData[i].input);
+    }
+
     var results = {};
     for(var j = 0; j <=100; j++) {
       results[j] = {
@@ -93,16 +84,8 @@ module.exports = {
     }
 
     for(var i = 0; i < testData.length; i++) {
-      //net.run gives us the net's prediction for that particular input
-      //TODO: SOLUTION CODE BELOW. Consider refactoring outside of for statement.
-      var rawPrediction = net.run(testData[i].input);
-      //we then format the net's prediction to be a number between 0 and 100
-      var prediction = Math.round( rawPrediction.defaulted * 100);
-      // console.log(net);
-      // console.log('prediction');
-      // console.log(rawPrediction);
-      // console.log('testData[i]');
-      // console.log(testData[i].input);
+      //we format the net's prediction to be a number between 0 and 100
+      var prediction = Math.round( testData[i].output.defaulted * 100);
       //We then increment the total number of cases that the net predicts exist at this level
       results[prediction].nnCount++;
       //And whether this input resulted in a default or not
@@ -169,13 +152,8 @@ module.exports = {
       obs.input.numDependents = Math.sqrt(item.NumberOfDependents)/5;
 
       formattedResults.push(obs);
-      // if( i % (Math.round(data.length/10)) === 0 ) {
-      //   console.log(data[i]);
-      //   console.log('returns to us');
-      //   console.log(obs);
-      // }
     }
-    console.log('formatted data');
+    console.log('formatted the data');
     return formattedResults;
 
   }
