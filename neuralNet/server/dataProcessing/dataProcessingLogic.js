@@ -5,7 +5,7 @@ var brain = require('brain');
 
 //TODO: SOLUTION CODE BELOW
 var net = new brain.NeuralNetwork({
-  hiddenLayers:[1000,1000,1000], //Use the docs to explore various numbers you might want to use here
+  hiddenLayers:[1000], //Use the docs to explore various numbers you might want to use here
   learningRate:0.3
 });
 /*
@@ -25,11 +25,16 @@ module.exports = {
         var testing = [];
         for(var i = 0; i < formattedData.length; i++) {
           if(Math.random() > .8) {
-            training.push(formattedData[i]);
-          } else {
             testing.push(formattedData[i]);
+          } else {
+            training.push(formattedData[i]);
           }
         }
+        console.log('training.length');
+        console.log(training.length);
+        console.log('testing.length');
+        console.log(testing.length);
+        res.send('Off to train the brain!');
         module.exports.trainBrain(training, testing);
       }
     });
@@ -64,7 +69,7 @@ module.exports = {
     //TODO: SOLUTION CODE BELOW
     net.train(trainingData,{
       errorThresh: 0.05,  // error threshold to reach
-      iterations: 30,   // maximum training iterations
+      iterations: 10,   // maximum training iterations
       log: true,           // console.log() progress periodically
       logPeriod: 1,       // number of iterations between logging
       learningRate: 0.3    // learning rate
@@ -93,11 +98,15 @@ module.exports = {
     }
 
     for(var i = 0; i < testData.length; i++) {
+      testData[i].output = net.run(testData[i].input);
+    }
+
+    for(var j = 0; j < testData.length; j++) {
       //net.run gives us the net's prediction for that particular input
       //TODO: SOLUTION CODE BELOW. Consider refactoring outside of for statement.
-      var rawPrediction = net.run(testData[i].input);
+      // var rawPrediction = net.run(testData[j].input);
       //we then format the net's prediction to be a number between 0 and 100
-      var prediction = Math.round( rawPrediction.defaulted * 100);
+      var prediction = Math.round( testData[j].output.defaulted * 100);
       // console.log(net);
       // console.log('prediction');
       // console.log(rawPrediction);
@@ -106,7 +115,7 @@ module.exports = {
       //We then increment the total number of cases that the net predicts exist at this level
       results[prediction].nnCount++;
       //And whether this input resulted in a default or not
-      results[prediction].defaulted += testData[i].output.defaulted;
+      results[prediction].defaulted += testData[j].output.defaulted;
     }
 
     //yeah, i know we don't like to assume the keys are going to be ordered, but it's a time-saving shortcut to make at the moment.
